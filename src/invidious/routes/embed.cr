@@ -7,6 +7,11 @@ module Invidious::Routes::Embed
         playlist = get_playlist(plid)
         offset = env.params.query["index"]?.try &.to_i? || 0
         videos = get_playlist_videos(playlist, offset: offset)
+        if videos.empty?
+          url = "/playlist?list=#{plid}"
+          raise NotFoundException.new("The video requested doesn't exist in the playlist. " \
+                                      "Click <a href='#{url}'>here</a> for the playlist home page.")
+        end
       rescue ex : NotFoundException
         return error_template(404, ex)
       rescue ex
@@ -62,6 +67,11 @@ module Invidious::Routes::Embed
           playlist = get_playlist(plid)
           offset = env.params.query["index"]?.try &.to_i? || 0
           videos = get_playlist_videos(playlist, offset: offset)
+          if videos.empty?
+            url = "/playlist?list=#{plid}"
+            raise NotFoundException.new("The video requested doesn't exist in the playlist. " \
+                                        "Click <a href='#{url}'>here</a> for the playlist home page.")
+          end
         rescue ex : NotFoundException
           return error_template(404, ex)
         rescue ex
