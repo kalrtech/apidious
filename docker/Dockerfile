@@ -25,18 +25,18 @@ RUN crystal spec --warnings all \
     --link-flags "-lxml2 -llzma"
 
 RUN if [[ "${release}" == 1 && "${disable_quic}" == 1 ]] ; then \
-        crystal build ./src/invidious.cr \
+        crystal build -Dapi_only ./src/invidious.cr \
         --release \
         -Ddisable_quic \
         --static --warnings all \
         --link-flags "-lxml2 -llzma"; \
     elif [[ "${release}" == 1 ]] ; then \
-        crystal build ./src/invidious.cr \
+        crystal build -Dapi_only ./src/invidious.cr \
         --release \
         --static --warnings all \
         --link-flags "-lxml2 -llzma"; \
     else \
-        crystal build ./src/invidious.cr \
+        crystal build -Dapi_only ./src/invidious.cr \
         --static --warnings all \
         --link-flags "-lxml2 -llzma"; \
     fi
