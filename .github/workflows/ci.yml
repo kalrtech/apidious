@@ -124,5 +124,21 @@ jobs:
 
       - name: Test Docker
         run: while curl -Isf http://localhost:3000; do sleep 1; done
+  
+  build-docker-api-only:
+
+          runs-on: ubuntu-latest
+      
+          steps:
+            - uses: actions/checkout@v3
+      
+            - name: Build Docker
+              run: docker-compose build --build-arg release=0 --build-arg api_only=1
+      
+            - name: Run Docker
+              run: docker-compose up -d
+      
+            - name: Test Docker
+              run: while curl -Isf http://localhost:3000; do sleep 1; done
 
 

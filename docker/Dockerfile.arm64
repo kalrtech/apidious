@@ -1,8 +1,9 @@
 FROM alpine:3.16 AS builder
-RUN apk add --no-cache 'crystal=1.4.1-r0' shards sqlite-static yaml-static yaml-dev libxml2-dev zlib-static openssl-libs-static openssl-dev musl-dev
+RUN apk add --no-cache 'crystal=1.4.1-r0' shards sqlite-static yaml-static yaml-dev libxml2-dev zlib-static openssl-libs-static openssl-dev musl-dev make cmake
 
 ARG release
 ARG disable_quic
+ARG api_only
 
 WORKDIR /invidious
 COPY ./shard.yml ./shard.yml
@@ -20,26 +21,12 @@ COPY ./.git/ ./.git/
 COPY ./scripts/ ./scripts/
 COPY ./assets/ ./assets/
 COPY ./videojs-dependencies.yml ./videojs-dependencies.yml
+COPY Makefile Makefile
 
 RUN crystal spec --warnings all \
     --link-flags "-lxml2 -llzma"
 
-RUN if [[ "${release}" == 1 && "${disable_quic}" == 1 ]] ; then \
-        crystal build -Dapi_only ./src/invidious.cr \
-        --release \
-        -Ddisable_quic \
-        --static --warnings all \
-        --link-flags "-lxml2 -llzma"; \
-    elif [[ "${release}" == 1 ]] ; then \
-        crystal build -Dapi_only ./src/invidious.cr \
-        --release \
-        --static --warnings all \
-        --link-flags "-lxml2 -llzma"; \
-    else \
-        crystal build -Dapi_only ./src/invidious.cr \
-        --static --warnings all \
-        --link-flags "-lxml2 -llzma"; \
-    fi
+RUN make "RELEASE=${release}" "DISABLE_QUIC=${disable_quic}" "API_ONLY=${api_only}"
 
 FROM alpine:3.16
 RUN apk add --no-cache librsvg ttf-opensans tini

@@ -103,3 +103,17 @@ jobs:
           push: true
           tags: quay.io/invidious/invidious:${{ github.sha }}-arm64-quic,quay.io/invidious/invidious:latest-arm64-quic
           build-args: release=1
+
+      - name: Build and push Docker AMD64 API_ONLY image with QUIC for Push Event
+        if: github.ref == 'refs/heads/master'
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: docker/Dockerfile
+          platforms: linux/amd64
+          labels: quay.expires-after=12w
+          push: true
+          tags: quay.io/invidious/invidious:${{ github.sha }}-quic,quay.io/invidious/invidious:latest-apionly
+          build-args: |
+            "release=1"
+            "api_only=1"
